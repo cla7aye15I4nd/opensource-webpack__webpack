@@ -14,6 +14,7 @@ require("../helpers/warmup-webpack");
  * @typedef {object} WatchTestConfig
  * @property {((i: EXPECTED_ANY, options: EXPECTED_ANY) => string)=} findBundle
  * @property {boolean=} noTests
+ * @property {((error: Error, compiler: import("../../").Compiler | import("../../").MultiCompiler) => void | Promise<void>)=} watchError check a fatal watch error and request recovery on the same compiler
  * @property {string=} skipFreshAssetContent reason asset contents depend on build history
  * @property {string=} skipFreshWarnings reason warnings depend on build history
  * @property {string=} skipFreshCompilation reason an independent compilation cannot reproduce this case
@@ -401,7 +402,11 @@ const describeCases = (config) => {
 										async (err, stats) => {
 											try {
 												if (failed) return;
-												if (err) throw err;
+												if (err) {
+													if (!testConfig.watchError) throw err;
+													await testConfig.watchError(err, compiler);
+													return;
+												}
 												if (!stats) {
 													throw new Error("No stats reported from Compiler");
 												}
