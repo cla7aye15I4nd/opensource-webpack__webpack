@@ -31,6 +31,7 @@ const checkArrayExpectation = require("../helpers/checkArrayExpectation");
 const compareWatchCompilation = require("../helpers/compareWatchCompilation");
 const createLazyTestEnv = require("../helpers/createLazyTestEnv");
 const deprecationTracking = require("../helpers/deprecationTracking");
+const loadWatchConfig = require("../helpers/loadWatchConfig");
 const prepareOptions = require("../helpers/prepareOptions");
 const { remove } = require("../helpers/remove");
 const supportsObjectHasOwn = require("../helpers/supportsObjectHasOwn");
@@ -294,6 +295,22 @@ const describeCases = (config) => {
 							} else {
 								applyConfig(options, 0);
 							}
+							/** @returns {Promise<import("../../").Configuration[]>} independent configurations */
+							const createFreshOptions = async () => {
+								const freshOptions = fs.existsSync(configPath)
+									? await prepareOptions(loadWatchConfig(configPath), {
+											testPath: outputDirectory,
+											srcPath: tempDirectory
+										})
+									: {};
+								const configurations = Array.isArray(freshOptions)
+									? freshOptions
+									: [freshOptions];
+								for (const [index, options] of configurations.entries()) {
+									applyConfig(options, index);
+								}
+								return configurations;
+							};
 
 							const state = {};
 							let runIdx = 0;
@@ -364,7 +381,7 @@ const describeCases = (config) => {
 									watchedCompiler = compiler;
 									const compare = compareWatchCompilation(
 										compiler,
-										options,
+										createFreshOptions,
 										freshOutputDirectory,
 										testConfig
 									);
