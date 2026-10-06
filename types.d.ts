@@ -6729,16 +6729,18 @@ declare class CssSourceProcessor extends SourceProcessor<
 		 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 		 */
 		source(n?: number | NodeSyntaxParser, end?: number): string;
+		/**
+		 * The token's value as CSS Syntax defines it, escapes resolved: a string
+		 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+		 * a rule, declaration, function or block, which have children instead.
+		 */
 		value(n?: NodeSyntaxParser): string;
-		unescaped(n?: NodeSyntaxParser): string;
 		typeFlag(n?: NodeSyntaxParser): string;
-		contentStart(n?: NodeSyntaxParser): number;
-		contentEnd(n?: NodeSyntaxParser): number;
+		valueStart(n?: NodeSyntaxParser): number;
+		valueEnd(n?: NodeSyntaxParser): number;
 		name(n?: NodeSyntaxParser): string;
 		nameStart(n?: NodeSyntaxParser): number;
 		nameEnd(n?: NodeSyntaxParser): number;
-		unescapedName(n?: NodeSyntaxParser): string;
-		atKeyword(n?: NodeSyntaxParser): string;
 		/**
 		 * A rule's children are its prelude; its block is read with {@link declarations }.
 		 */
@@ -11778,6 +11780,10 @@ declare class HtmlSourceProcessor extends SourceProcessor<
 		 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 		 */
 		source(n?: number, end?: number): string;
+		/**
+		 * An element's tag name (lowercased, adjusted in foreign content), a
+		 * doctype's name, a processing instruction's target; "" for other nodes.
+		 */
 		name(n?: number): string;
 		namespace(n?: number): number;
 		selfClosing(n?: number): boolean;
@@ -11829,11 +11835,13 @@ declare class HtmlSourceProcessor extends SourceProcessor<
 		contentStart(n?: number): number;
 		contentEnd(n?: number): number;
 		templateContent(n?: number): number;
-		data(n?: number): string;
-		piTarget(n?: number): string;
-		doctypeName(n?: number): string;
-		doctypePublicId(_n?: number): null | string;
-		doctypeSystemId(_n?: number): null | string;
+		/**
+		 * A text's, comment's or processing instruction's data, character
+		 * references decoded; "" for other nodes.
+		 */
+		value(n?: number): string;
+		publicId(_n?: number): null | string;
+		systemId(_n?: number): null | string;
 		/**
 		 * Counted along the sibling links once per node and visitor call.
 		 */
@@ -20646,7 +20654,7 @@ declare interface NodeOptions {
  * The members every language's `path` has under the same name and meaning, so
  * a visitor written against it reads any grammar; see `docs/syntax.md`.
  */
-declare interface NodePath<TNode> {
+declare interface NodePath<TNode, TValue = string> {
 	/**
 	 * the current node
 	 */
@@ -20696,6 +20704,16 @@ declare interface NodePath<TNode> {
 	 * the node's source text, or the input between two offsets
 	 */
 	source: (n?: number | TNode, end?: number) => string;
+
+	/**
+	 * the node's name as the language defines it, decoded ("" when it has none)
+	 */
+	name: (n?: TNode) => string;
+
+	/**
+	 * the node's value as the language defines it, decoded
+	 */
+	value: (n?: TNode) => TValue;
 
 	/**
 	 * number of children
@@ -29654,7 +29672,7 @@ declare interface SourcePosition {
  * ```
  */
 declare abstract class SourceProcessor<
-	TPath extends NodePath<TNode>,
+	TPath extends NodePath<TNode, string>,
 	TNode,
 	TProcessOptions = object,
 	TPrintOptions = object
@@ -33860,16 +33878,18 @@ declare namespace exports {
 					 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 					 */
 					source(n?: number | NodeSyntaxParser, end?: number): string;
+					/**
+					 * The token's value as CSS Syntax defines it, escapes resolved: a string
+					 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+					 * a rule, declaration, function or block, which have children instead.
+					 */
 					value(n?: NodeSyntaxParser): string;
-					unescaped(n?: NodeSyntaxParser): string;
 					typeFlag(n?: NodeSyntaxParser): string;
-					contentStart(n?: NodeSyntaxParser): number;
-					contentEnd(n?: NodeSyntaxParser): number;
+					valueStart(n?: NodeSyntaxParser): number;
+					valueEnd(n?: NodeSyntaxParser): number;
 					name(n?: NodeSyntaxParser): string;
 					nameStart(n?: NodeSyntaxParser): number;
 					nameEnd(n?: NodeSyntaxParser): number;
-					unescapedName(n?: NodeSyntaxParser): string;
-					atKeyword(n?: NodeSyntaxParser): string;
 					/**
 					 * A rule's children are its prelude; its block is read with {@link declarations }.
 					 */
@@ -34033,16 +34053,18 @@ declare namespace exports {
 						 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 						 */
 						source(n?: number | NodeSyntaxParser, end?: number): string;
+						/**
+						 * The token's value as CSS Syntax defines it, escapes resolved: a string
+						 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+						 * a rule, declaration, function or block, which have children instead.
+						 */
 						value(n?: NodeSyntaxParser): string;
-						unescaped(n?: NodeSyntaxParser): string;
 						typeFlag(n?: NodeSyntaxParser): string;
-						contentStart(n?: NodeSyntaxParser): number;
-						contentEnd(n?: NodeSyntaxParser): number;
+						valueStart(n?: NodeSyntaxParser): number;
+						valueEnd(n?: NodeSyntaxParser): number;
 						name(n?: NodeSyntaxParser): string;
 						nameStart(n?: NodeSyntaxParser): number;
 						nameEnd(n?: NodeSyntaxParser): number;
-						unescapedName(n?: NodeSyntaxParser): string;
-						atKeyword(n?: NodeSyntaxParser): string;
 						/**
 						 * A rule's children are its prelude; its block is read with {@link declarations }.
 						 */
@@ -34094,16 +34116,18 @@ declare namespace exports {
 									 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 									 */
 									source(n?: number | NodeSyntaxParser, end?: number): string;
+									/**
+									 * The token's value as CSS Syntax defines it, escapes resolved: a string
+									 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+									 * a rule, declaration, function or block, which have children instead.
+									 */
 									value(n?: NodeSyntaxParser): string;
-									unescaped(n?: NodeSyntaxParser): string;
 									typeFlag(n?: NodeSyntaxParser): string;
-									contentStart(n?: NodeSyntaxParser): number;
-									contentEnd(n?: NodeSyntaxParser): number;
+									valueStart(n?: NodeSyntaxParser): number;
+									valueEnd(n?: NodeSyntaxParser): number;
 									name(n?: NodeSyntaxParser): string;
 									nameStart(n?: NodeSyntaxParser): number;
 									nameEnd(n?: NodeSyntaxParser): number;
-									unescapedName(n?: NodeSyntaxParser): string;
-									atKeyword(n?: NodeSyntaxParser): string;
 									/**
 									 * A rule's children are its prelude; its block is read with {@link declarations }.
 									 */
@@ -34230,16 +34254,18 @@ declare namespace exports {
 						 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 						 */
 						source(n?: number | NodeSyntaxParser, end?: number): string;
+						/**
+						 * The token's value as CSS Syntax defines it, escapes resolved: a string
+						 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+						 * a rule, declaration, function or block, which have children instead.
+						 */
 						value(n?: NodeSyntaxParser): string;
-						unescaped(n?: NodeSyntaxParser): string;
 						typeFlag(n?: NodeSyntaxParser): string;
-						contentStart(n?: NodeSyntaxParser): number;
-						contentEnd(n?: NodeSyntaxParser): number;
+						valueStart(n?: NodeSyntaxParser): number;
+						valueEnd(n?: NodeSyntaxParser): number;
 						name(n?: NodeSyntaxParser): string;
 						nameStart(n?: NodeSyntaxParser): number;
 						nameEnd(n?: NodeSyntaxParser): number;
-						unescapedName(n?: NodeSyntaxParser): string;
-						atKeyword(n?: NodeSyntaxParser): string;
 						/**
 						 * A rule's children are its prelude; its block is read with {@link declarations }.
 						 */
@@ -34289,16 +34315,18 @@ declare namespace exports {
 							 * the character it names (§4.3.5 inside a string, §4.3.7 anywhere else).
 							 */
 							source(n?: number | NodeSyntaxParser, end?: number): string;
+							/**
+							 * The token's value as CSS Syntax defines it, escapes resolved: a string
+							 * without its quotes, a hash without its `#`, a `url()`'s contents; "" for
+							 * a rule, declaration, function or block, which have children instead.
+							 */
 							value(n?: NodeSyntaxParser): string;
-							unescaped(n?: NodeSyntaxParser): string;
 							typeFlag(n?: NodeSyntaxParser): string;
-							contentStart(n?: NodeSyntaxParser): number;
-							contentEnd(n?: NodeSyntaxParser): number;
+							valueStart(n?: NodeSyntaxParser): number;
+							valueEnd(n?: NodeSyntaxParser): number;
 							name(n?: NodeSyntaxParser): string;
 							nameStart(n?: NodeSyntaxParser): number;
 							nameEnd(n?: NodeSyntaxParser): number;
-							unescapedName(n?: NodeSyntaxParser): string;
-							atKeyword(n?: NodeSyntaxParser): string;
 							/**
 							 * A rule's children are its prelude; its block is read with {@link declarations }.
 							 */
@@ -34428,6 +34456,10 @@ declare namespace exports {
 					 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 					 */
 					source(n?: number, end?: number): string;
+					/**
+					 * An element's tag name (lowercased, adjusted in foreign content), a
+					 * doctype's name, a processing instruction's target; "" for other nodes.
+					 */
 					name(n?: number): string;
 					namespace(n?: number): number;
 					selfClosing(n?: number): boolean;
@@ -34479,11 +34511,13 @@ declare namespace exports {
 					contentStart(n?: number): number;
 					contentEnd(n?: number): number;
 					templateContent(n?: number): number;
-					data(n?: number): string;
-					piTarget(n?: number): string;
-					doctypeName(n?: number): string;
-					doctypePublicId(_n?: number): null | string;
-					doctypeSystemId(_n?: number): null | string;
+					/**
+					 * A text's, comment's or processing instruction's data, character
+					 * references decoded; "" for other nodes.
+					 */
+					value(n?: number): string;
+					publicId(_n?: number): null | string;
+					systemId(_n?: number): null | string;
 					/**
 					 * Counted along the sibling links once per node and visitor call.
 					 */
@@ -34577,6 +34611,10 @@ declare namespace exports {
 						 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 						 */
 						source(n?: number, end?: number): string;
+						/**
+						 * An element's tag name (lowercased, adjusted in foreign content), a
+						 * doctype's name, a processing instruction's target; "" for other nodes.
+						 */
 						name(n?: number): string;
 						namespace(n?: number): number;
 						selfClosing(n?: number): boolean;
@@ -34628,11 +34666,13 @@ declare namespace exports {
 						contentStart(n?: number): number;
 						contentEnd(n?: number): number;
 						templateContent(n?: number): number;
-						data(n?: number): string;
-						piTarget(n?: number): string;
-						doctypeName(n?: number): string;
-						doctypePublicId(_n?: number): null | string;
-						doctypeSystemId(_n?: number): null | string;
+						/**
+						 * A text's, comment's or processing instruction's data, character
+						 * references decoded; "" for other nodes.
+						 */
+						value(n?: number): string;
+						publicId(_n?: number): null | string;
+						systemId(_n?: number): null | string;
 						/**
 						 * Counted along the sibling links once per node and visitor call.
 						 */
@@ -34676,6 +34716,10 @@ declare namespace exports {
 									 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 									 */
 									source(n?: number, end?: number): string;
+									/**
+									 * An element's tag name (lowercased, adjusted in foreign content), a
+									 * doctype's name, a processing instruction's target; "" for other nodes.
+									 */
 									name(n?: number): string;
 									namespace(n?: number): number;
 									selfClosing(n?: number): boolean;
@@ -34727,11 +34771,13 @@ declare namespace exports {
 									contentStart(n?: number): number;
 									contentEnd(n?: number): number;
 									templateContent(n?: number): number;
-									data(n?: number): string;
-									piTarget(n?: number): string;
-									doctypeName(n?: number): string;
-									doctypePublicId(_n?: number): null | string;
-									doctypeSystemId(_n?: number): null | string;
+									/**
+									 * A text's, comment's or processing instruction's data, character
+									 * references decoded; "" for other nodes.
+									 */
+									value(n?: number): string;
+									publicId(_n?: number): null | string;
+									systemId(_n?: number): null | string;
 									/**
 									 * Counted along the sibling links once per node and visitor call.
 									 */
@@ -34806,6 +34852,10 @@ declare namespace exports {
 						 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 						 */
 						source(n?: number, end?: number): string;
+						/**
+						 * An element's tag name (lowercased, adjusted in foreign content), a
+						 * doctype's name, a processing instruction's target; "" for other nodes.
+						 */
 						name(n?: number): string;
 						namespace(n?: number): number;
 						selfClosing(n?: number): boolean;
@@ -34857,11 +34907,13 @@ declare namespace exports {
 						contentStart(n?: number): number;
 						contentEnd(n?: number): number;
 						templateContent(n?: number): number;
-						data(n?: number): string;
-						piTarget(n?: number): string;
-						doctypeName(n?: number): string;
-						doctypePublicId(_n?: number): null | string;
-						doctypeSystemId(_n?: number): null | string;
+						/**
+						 * A text's, comment's or processing instruction's data, character
+						 * references decoded; "" for other nodes.
+						 */
+						value(n?: number): string;
+						publicId(_n?: number): null | string;
+						systemId(_n?: number): null | string;
 						/**
 						 * Counted along the sibling links once per node and visitor call.
 						 */
@@ -34903,6 +34955,10 @@ declare namespace exports {
 							 * A node's text as written; valid during the walk, before `parseHtml` releases the source.
 							 */
 							source(n?: number, end?: number): string;
+							/**
+							 * An element's tag name (lowercased, adjusted in foreign content), a
+							 * doctype's name, a processing instruction's target; "" for other nodes.
+							 */
 							name(n?: number): string;
 							namespace(n?: number): number;
 							selfClosing(n?: number): boolean;
@@ -34954,11 +35010,13 @@ declare namespace exports {
 							contentStart(n?: number): number;
 							contentEnd(n?: number): number;
 							templateContent(n?: number): number;
-							data(n?: number): string;
-							piTarget(n?: number): string;
-							doctypeName(n?: number): string;
-							doctypePublicId(_n?: number): null | string;
-							doctypeSystemId(_n?: number): null | string;
+							/**
+							 * A text's, comment's or processing instruction's data, character
+							 * references decoded; "" for other nodes.
+							 */
+							value(n?: number): string;
+							publicId(_n?: number): null | string;
+							systemId(_n?: number): null | string;
 							/**
 							 * Counted along the sibling links once per node and visitor call.
 							 */
