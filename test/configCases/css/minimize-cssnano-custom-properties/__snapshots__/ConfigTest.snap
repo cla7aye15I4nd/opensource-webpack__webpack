@@ -19,6 +19,6 @@ Array [
   "/*! whitespace: an escaped tab ends the value it is written in */.w11{--x:1;--y:red\\\\	}",
   "/*! params: a custom property in a @supports condition */@supports (--foo:green){.p1{color:red}}",
   "/*! params: an empty value in one */@supports (--foo:){.p2{background:green}}",
-  "/*! params: two of them across \`or\` */@supports ((--foo:) or (--bar:green)){.p3{background:green}}",
+  "/*! params: two of them across \`or\` */@supports (--foo:) or (--bar:green){.p3{background:green}}",
 ]
 `;
