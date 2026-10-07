@@ -22,7 +22,7 @@ Array [
   "/*! webpack: an empty @supports is inert */",
   "/*! webpack: an empty @container is inert */",
   "/*! webpack: an empty @page is kept (its margin boxes are not modelled) */@page{}",
-  "/*! webpack: an empty @scope is kept */@scope (.t09){}",
+  "/*! webpack: an empty @scope is kept */@scope(.t09){}",
   "/*! webpack: a nested empty rule is dropped, the outer one survives */.t10{color:red}",
   "/*! webpack: an outer rule left empty by its nested rules is dropped */",
   "/*! webpack: input the grammar rejects is not \\"empty\\" */.t14{*zoom: 1}",
