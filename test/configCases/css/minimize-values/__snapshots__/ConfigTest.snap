@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-values minimize-values should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! convert-values: should convert milliseconds to seconds */.t01{transition-duration:.5s}",
   "/*! convert-values: should convert milliseconds to seconds (2) */.t02{animation:opacity 0s 1s}",
   "/*! convert-values: should convert seconds to milliseconds */.t03{transition-duration:5ms}",

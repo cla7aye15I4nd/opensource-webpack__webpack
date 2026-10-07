@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-declined minimize-declined should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! declined here only because this case builds for no particular target — for a
    selection with no hex alpha it stays, and otherwise it is \`#0000\`
    (see the \`minimize-environment\` case) (lightningcss: #0000) */.t05{background-color:#0000}",

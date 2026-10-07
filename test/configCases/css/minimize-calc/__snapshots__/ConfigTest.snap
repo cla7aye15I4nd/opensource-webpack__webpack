@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-calc minimize-calc should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! calc: a sum of one unit is that unit */.c01{width:3px}",
   "/*! calc: ...and subtraction the same way */.c02{width:6px}",
   "/*! calc: a product by a plain number */.c03{width:2px}",

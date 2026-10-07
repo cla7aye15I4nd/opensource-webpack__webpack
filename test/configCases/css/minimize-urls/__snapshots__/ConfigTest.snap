@@ -2,7 +2,7 @@
 
 exports[`ConfigTestCases css minimize-urls minimize-urls should compile 1`] = `
 Array [
-  "@import url(http://website.test/foo.css);",
+  "@charset \\"UTF-8\\";@import url(http://website.test/foo.css);",
   "/*! normalize-url: should strip double quotes */.t01{background:url(http://website.test/cat.jpg)}",
   "/*! normalize-url: should strip single quotes */.t02{background:url(http://website.test/cat.jpg)}",
   "/*! normalize-url: should strip double quotes uppercase URL */.t03{background:url(http://website.test/cat.jpg)}",

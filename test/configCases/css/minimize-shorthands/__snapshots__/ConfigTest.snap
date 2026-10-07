@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-shorthands minimize-shorthands should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! box: every side equal */.t01{margin:1px}",
   "/*! box: axes equal */.t02{margin:1px 2px}",
   "/*! box: left equal to right */.t03{margin:1px 2px 3px}",

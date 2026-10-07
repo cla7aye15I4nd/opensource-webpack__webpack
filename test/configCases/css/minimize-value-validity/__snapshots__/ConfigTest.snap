@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-value-validity minimize-value-validity should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! invalid: a quoted family beside a bare identifier matches no family list */.a{font-family:\\"Lucida\\"Grande,sans-serif}",
   "/*! valid: a lone string is a family, so unquoting it stays one */.b{font-family:Lucida Grande,sans-serif}",
   "/*! invalid: \`<integer>\` takes no fraction, so this computes \`auto\` */.c{grid-row:1.0}",

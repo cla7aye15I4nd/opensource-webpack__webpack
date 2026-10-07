@@ -2,6 +2,7 @@
 
 exports[`ConfigTestCases css minimize-calc-lightningcss minimize-calc-lightningcss should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! width: calc(1px + 2px) — same as lightningcss: 3px */.k001{width:3px}",
   "/*! width: calc(10px - 4px) — same as lightningcss: 6px */.k002{width:6px}",
   "/*! width: calc(2px * 3) — same as lightningcss: 6px */.k003{width:6px}",

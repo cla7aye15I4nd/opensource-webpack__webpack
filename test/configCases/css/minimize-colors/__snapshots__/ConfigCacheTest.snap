@@ -2,6 +2,7 @@
 
 exports[`ConfigCacheTestCases css minimize-colors minimize-colors should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! colormin: should minify lowercase color values */.t01{color:#ff0}",
   "/*! colormin: should minify uppercase color values */.t02{color:#ff0}",
   "/*! colormin: should minify color values (2) */.t03{box-shadow:0 1px 3px#ffe6dc80}",

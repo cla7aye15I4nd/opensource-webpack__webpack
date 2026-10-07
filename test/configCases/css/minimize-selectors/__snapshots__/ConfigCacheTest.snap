@@ -2,6 +2,7 @@
 
 exports[`ConfigCacheTestCases css minimize-selectors minimize-selectors should compile 1`] = `
 Array [
+  "@charset \\"UTF-8\\";",
   "/*! lightningcss: [foo=\\"baz\\"] */[foo=baz]{color:red}",
   "/*! lightningcss: [foo=\\"foo bar\\"] */[foo=\\"foo bar\\"]{color:red}",
   "/*! lightningcss: [foo=\\"foo bar baz\\"] */[foo=\\"foo bar baz\\"]{color:red}",
