@@ -649,6 +649,24 @@ const IMPROVED_CASES = [
 		"var h = (function () { const t = [0, 0]; return function (o) { const s = t; s[0]++; { let t = o; t.v = s[0]; } return o; }; })(); console.log(h({}).v, h({}).v);",
 		{ compress: { passes: 2 }, mangle: false }
 	],
+	[
+		"a function written in place passed the names of its parameters, which it reads instead, its value called, tagged, typed or read past a chain",
+		'function f(o, k) { var a = (function (o, k) { return o.k ? o.m : o[k]; })(o, k)(), c = typeof (function (o, k) { return o[k] || o.p; })(o, k), d = (function (o, k) { return o?.[o.k]?.[k]; })(o, k).length, e = (function (o, k) { return o[k] ? o.u : o.t; })(o, k)`x`; return [a === o, c, d, e]; } console.log(f({ k: "p", p: { q: "ab" }, m() { return this; }, t(s) { return s[0]; } }, "q"));',
+		{ compress: {}, mangle: false },
+		'function f(o,k){var a=function(){return o.k?o.m:o[k]}()(),c=typeof function(){return o[k]||o.p}(),d=function(){return o?.[o.k]?.[k]}().length,e=function(){return o[k]?o.u:o.t}()`x`;return[a===o,c,d,e]}console.log(f({k:"p",p:{q:"ab"},m(){return this},t:s=>s[0]},"q"));'
+	],
+	[
+		"an arrow written in place passed the names of its parameters, naming `yield` inside a generator",
+		"function* g(o, p) { yield ((o, p) => [o, p, typeof yield])(o, p); } console.log([...g(1, 2)][0].join());",
+		{ compress: {}, mangle: false },
+		"function*g(o,p){yield(()=>[o,p,typeof yield])()}console.log([...g(1,2)][0].join());"
+	],
+	[
+		"a function written in place passed the names of its parameters, returning a string that would read as a directive",
+		'function f(o, p) { for (;;) { (function (o, p) { return "use strict"; })(o, p); break; } return this === null; } console.log(f.call(null, 1, 2));',
+		{ compress: { side_effects: false, unused: false }, mangle: false },
+		'function f(o,p){for(;;){(function(){return"use strict"})();break}return null===this}console.log(f.call(null,1,2));'
+	],
 	...[
 		[
 			"an array of strings split on `.`",
@@ -737,6 +755,22 @@ const IMPROVED_CASES = [
 		[
 			"a `#__PURE__` call of a function written in place, passed nothing, as the value it returns",
 			"function g(x) { return [x]; } var o = { m: g }; function f(a) { var x = /* @__PURE__ */ (() => [a, 1])(), y = /* @__PURE__ */ (function () { return new Map(); })(), z = /* @__PURE__ */ (() => g(a))(), w = /* @__PURE__ */ (() => o.m(2))(); /* @__PURE__ */ (() => g(a))(); return [x, y.size, z, w, /* @__PURE__ */ (function () { return; })()]; } console.log(f(1));"
+		],
+		[
+			"a function written in place passed the names of its parameters, as the value it returns",
+			'function f(node, list) { return [(function (node) { return node.name + node.kind; })(node), ((node, list) => list.length + node.kind + list[0])(node, list)]; } console.log(f({ name: "a", kind: "b" }, [1]));'
+		],
+		[
+			"a function written in place passed the names of its parameters, which it reads instead",
+			"function f(o, p) { var s = (function (o, p) { var t = o.a; return [t, t, o.b, p, p]; })(o, p); (function (o, p) { for (var k in o) console.log(k, o[k], p, p); })(o, p); return s; } console.log(f({ a: 1, b: 2 }, 3));"
+		],
+		[
+			"a function written in place passed a `var`, a `let`, a `const` and a function of the names of its parameters",
+			"function f(a) { var v = a * 2; let l = a + 1; const c = a - 1; function d() { return a; } var r = (function (v, l, c, d, x) { return [v, v, l, l, c, c, d(), d(), x, [x].map(function (y) { return y + x; })[0]]; })(v, l, c, d, a + 5); return r.concat(v, l, c, d()); } console.log(f(3));"
+		],
+		[
+			"an arrow written in place passed the name of its parameter inside a generator, as the value it returns",
+			"function* g(o) { yield ((o) => [o.a, o.b, o])(o); } console.log([...g({ a: 1, b: 2 })][0].length);"
 		]
 	].map(
 		([name, input]) =>
@@ -886,7 +920,24 @@ const KEPT_CASES = [
 	["a computed key a class can write as it is", 'class C { ["prototype"] = 1; ["prototype"]() {} static ["#prototype"] = 2; static ["constructor"] = 3; static [0]() {} } console.log(new C().prototype, C["#prototype"], C.constructor, typeof C[0]);'],
 	["an unused class whose static keys are not known to be `prototype`", 'function f(k) { var p = "prototype"; class K { static x() {} static ["y"] = 1; ["prototype"]() {} [p]() {} static [k]() {} static [0]() {} static [-1]() {} static [["x"]]() {} static [["prototype", "x"]]() {} static [[]]() {} static [[k]]() {} } return 1; } console.log(f("x"), f(1));'],
 	["a computed `__proto__` an object can write as an arrow", 'var o = { ["__proto__"]() { return 1; }, a() { return 2; } }; console.log(Object.keys(o).join(), o.__proto__(), o.a());'],
-	["a computed key an object can write as it is", 'var o = { ["#constructor"]() { return 1; }, ["prototype"]: 2 }, p = { get ["#" + "constructor"]() { return 3; } }; console.log(o["#constructor"](), o.prototype, p["#constructor"]);']
+	["a computed key an object can write as it is", 'var o = { ["#constructor"]() { return 1; }, ["prototype"]: 2 }, p = { get ["#" + "constructor"]() { return 3; } }; console.log(o["#constructor"](), o.prototype, p["#constructor"]);'],
+	["a function written in place writing a parameter it is passed the name of, or passed a name written later", "function f(a, b) { var g = (function (a) { return function () { return a + a; }; })(a), h = (function (b) { [b] = [b + 1]; return [b, b]; })(b); [a] = [5]; return [g(), h]; } console.log(f(1, 2));"],
+	["a function written in place returning a function that reads a `var` or a function declared in a loop", "function f(xs) { var r = []; for (var i = 0; i < xs.length; i++) { var x = xs[i] * 2; function h() { return x; } r.push((function (x, h) { return function () { return x + h() + x + h(); }; })(x, h)); } return r.map(function (g) { return g(); }); } console.log(f([1, 2]));"],
+	["a function written in place reading its `arguments`", "function f(a) { return (function (a) { return [a, a, arguments.length]; })(a, 1); } console.log(f(1));"],
+	["a function written in place passed a parameter of a function reading its `arguments`", "function f(a) { var args = arguments; return (function (a) { return [a, (args[0] = 5), a]; })(a); } console.log(f(1));"],
+	["a function written in place in a default value, passed a parameter not yet set", "function f(a = (function (b) { return function () { return [b, b]; }; })(b), b = 1) { return a(); } try { console.log(f()); } catch (e) { console.log(e.name); }"],
+	["a function written in place reading its own name", "function f(a) { return (function g(a) { return [a, a, typeof g]; })(a); } console.log(f(1));"],
+	["a generator written in place", "function f(a) { return [...(function* (a) { yield a; yield a; })(a)]; } console.log(f(1));"],
+	["an async function written in place", "function f(a) { return (async function (a) { return [a, a]; })(a); } f(1).then(console.log);"],
+	["a function written in place calling `eval`", 'function f(a) { return (function (a) { return [a, a, eval("a")]; })(a); } console.log(f(1));'],
+	["a function written in place with a default value", "function f(a, b) { return (function (a, b = 2) { return [a, a, b]; })(a, b); } console.log(f(1));"],
+	["a function written in place passed a spread", "function f(a, c) { return (function (a, b) { return [a, a, b]; })(a, ...c); } console.log(f(1, [2]));"],
+	["a function written in place passed a `let` before it is set, or a global", "function f() { try { return (function (a) { return [a, a]; })(a); } catch (e) { return e.name; } let a = 1; } function g() { return (function (b) { return [b, b]; })(b); } var b = 1; console.log(f(), g());"],
+	["a function written in place passed a `var` before it is set", "function f() { var g = (function (a) { return [a, a]; })(a); var a = 1; return g; } console.log(f());"],
+	["a function written in place passed a name declared twice, or declaring its parameter again", "function f(a, b) { var a; return [(function (a) { return [a, a]; })(a), (function (b) { var b; return [b, b]; })(b)]; } console.log(f(1, 2));"],
+	["a function written in place passed a name a `with` may read", "function f(a) { with ({}) return (function (a) { return [a, a]; })(a); } console.log(f(1));"],
+	["a function written in place passed an undeclared name", "function f() { return (function (a) { return [a, a]; })(a); } try { console.log(f()); } catch (e) { console.log(e.name); }"],
+	["a function written in place passed the name of its one parameter, which would stay called", "function f(o) { return (function (o) { var t = o.a; return [t, t, o.b]; })(o); } console.log(f({ a: 1, b: 2 }));"]
 ];
 
 // Each prints one thing and terser's output another, under the options named.

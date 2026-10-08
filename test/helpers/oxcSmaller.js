@@ -643,7 +643,6 @@ const OXC_SMALLER_BY_REASON = [
 			"swc minifier: fixture/issues/react/hooks/3/input.js",
 			"swc minifier: fixture/issues/vercel/005/input.js",
 			"swc minifier: fixture/next/31077/static/chunks/1606726a.10299989c08cb523/input.js",
-			"swc minifier: fixture/next/33265/static/chunks/pages/index-cb36c1bf7f830e3c/input.js",
 			"swc minifier: fixture/next/36127/2/3/input.js",
 			"swc minifier: fixture/next/41527/1/input.js",
 			"swc minifier: fixture/next/47005/input.js",
