@@ -1282,8 +1282,8 @@ const rivalSmallerSeen = new Set();
 const IMPROVED_YET_BIGGER = {
 	"arrow/object_parens (its own options)":
 		"3 bytes fewer, 1 more gzipped: `+!!{}` breaks the `()=>(` runs of the arrows around it gzip reused",
-	"projects/files/jquery.mobile-1.4.2.js (the default minimizer's options)":
-		"30 bytes fewer, 2 more gzipped: `this.p=c?x:y` breaks the `c?this.p=x:this.p=y` runs gzip reused",
+	"projects/files/jquery.mobile-1.4.2.js (its own options)":
+		"50 bytes fewer, 1 more gzipped: `if(null!=r)return r` in place of `return null==r?void 0:r` loses the `return null==` gzip reused",
 	"fixture/next/regression-1/framework-798bab57daac3897/input.js (its own options)":
 		"195 bytes fewer, 23 more gzipped: `!!x` in place of `null!==x` breaks the runs of `null!==` gzip reused",
 	"projects/files/react-17.0.1.js (its own options)":
@@ -1561,7 +1561,6 @@ for (const [reason, keys] of /** @type {[string, string[]][]} */ ([
 			"non-callable-join-string-tag.js (the default minimizer's options)",
 			"optional-catch-binding-throws.js (the default minimizer's options)",
 			"predicate-throws-then-closing-iterator-also-throws.js (the default minimizer's options)",
-			"quantifier-integer-limit.js (the default minimizer's options)",
 			"sorting_buffer_access.js (the default minimizer's options)",
 			"symbol-tag-override-instances.js (the default minimizer's options)",
 			"this-val-regexp.js (the default minimizer's options)",
